@@ -1,0 +1,125 @@
+button {
+    border: none;
+    border-radius: 5px;
+    background-color: var(--elevation-6);
+    color: var(--text-medium-emphasis);
+}
+
+button>*{
+    padding: 0.5em 0.375em;
+}
+
+button:hover {
+    cursor: pointer;
+    background-color: var(--elevation-24);
+    color: var(--text-medium-emphasis);
+}
+
+select {
+    background-color: transparent;
+    color: inherit;
+    border: none;
+    border-radius: inherit;
+
+    font-size: 16px;
+
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+
+select:hover {
+    cursor: pointer;
+    background-color: #4b4a4e;
+    color: inherit;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+
+    border-radius: 5px;
+    background-color: var(--elevation-6);
+    color: var(--text-medium-emphasis);
+}
+
+.dropdown:hover {
+    background-color: var(--elevation-24);
+    color: var(--text-medium-emphasis);
+}
+
+.dropdown-arrow {
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    padding: 0.6em 0.75em;
+
+    font-size: 16px;
+    color: inherit;
+    pointer-events: none;
+}
+
+.dropdown select {
+    padding: 8px;
+    font-size: 16px;
+    width: 100%;
+}
+
+
+label {
+    font-size: 24px;
+    padding: 0.25em;
+    color: var(--text-medium-emphasis);
+}
+
+progress {
+    width: 50%;
+}
+
+input {
+    padding: 0.6em 0.75em;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--elevation-6);
+    color: var(--text-medium-emphasis);
+}
+
+input[type="number"] {
+    width: 3.25em;
+}
+
+input:focus-visible {
+    background-color: var(--elevation-24);
+    color: var(--text-medium-emphasis);
+    outline: 2px solid var(--primary);
+    border: none;
+}
+
+input:invalid {
+    outline: 2px solid var(--error);
+}
+
+.invalid,
+.valid {
+    display: none;
+    padding: 0.25em;
+}
+
+input:invalid~.invalid {
+    display: block;
+    color: var(--error);
+}
+
+input:valid~.valid {
+    display: block;
+    color: var(--secondary);
+}
+
+input:focus-visible:valid~.valid {
+    display: block;
+    color: var(--primary);
+}

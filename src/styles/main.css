@@ -1,0 +1,110 @@
+:root {
+    --elevation-0: rgba(255, 255, 255, 0%);
+    --elevation-1: rgba(255, 255, 255, 5%);
+    --elevation-2: rgba(255, 255, 255, 7%);
+    --elevation-3: rgba(255, 255, 255, 8%);
+    --elevation-4: rgba(255, 255, 255, 9%);
+    --elevation-6: rgba(255, 255, 255, 11%);
+    --elevation-8: rgba(255, 255, 255, 12%);
+    --elevation-12: rgba(255, 255, 255, 14%);
+    --elevation-16: rgba(255, 255, 255, 15%);
+    --elevation-24: rgba(255, 255, 255, 16%);
+
+    --primary: #b694f6;
+    --primary-variant: #3700B3;
+    --secondary: #03DAC6;
+    --error: #cf6679;
+
+    --surface: #121212;
+    --background: color-mix(in oklab, var(--surface), var(--primary) 8%);
+
+    --on-primary: #000;
+    --on-secondary: #000;
+    --on-background: #fff;
+    --on-surface: #fff;
+    --on-error: #000;
+
+    --text-high-emphasis: rgba(255, 255, 255, 0.87);
+    --text-medium-emphasis: rgba(255, 255, 255, 0.60);
+    --text-disabled: rgba(255, 255, 255, 0.38);
+
+    font-family: 'Covered By Your Grace', cursive;
+}
+
+html {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+body {
+    flex-grow: 1;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--background);
+}
+
+body>header {
+    padding: 0.5em;
+    height: min-content;
+    background-color: var(--elevation-1);
+}
+
+.canvas-wrapper {
+    flex-grow: 1;
+}
+
+.canvas-wrapper>* {
+    position: absolute;
+}
+
+#canvas-overlay {
+    display: flex;
+    flex-direction: column;
+    padding: 0.25em;
+
+    /*background-color: var(--elevation-2);*/
+    color: #03DAC6;
+    font-size: 1.5em;
+}
+
+body>footer {
+    padding: 0.5em;
+    height: min-content;
+    background-color: var(--elevation-1);
+    gap: 0.5em;
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.flex-row>* {
+    flex-grow: 1;
+}
+
+.flex-row-space-between {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.flex-center {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.flex-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}

@@ -7,10 +7,12 @@ import {
     SphereGenerator, CuboidGenerator, ConeGenerator, CylinderGenerator,
     TriAxialEllipsoidGenerator, OctantElilipsoidGenerator,
     SphereAndCarveOctantEllipsoidGenerator,
-    SimplexNoiseSphereGenerator, MinkowskiGenerator,
+    SimplexNoiseSphereGenerator, SimplexNoisePillarsGenerator,
+    MinkowskiGenerator,
     CuboidCellularNoiseGenerator,
     MoundGenerator,
-    EggGenerator
+    EggGenerator,
+    HangingSpikesGenerator
 } from "./Generators.js";
 
 class GeneratorRegistry {
@@ -21,6 +23,8 @@ class GeneratorRegistry {
 
     static {
         GeneratorRegistry.registerAll(
+            new HangingSpikesGenerator(),
+            new SimplexNoisePillarsGenerator(),
             new OctantElilipsoidGenerator(),
             new SphereAndCarveOctantEllipsoidGenerator(),
             new MoundGenerator(),

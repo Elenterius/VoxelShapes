@@ -14,6 +14,11 @@ export class SceneHandler {
      */
     meshes = [];
 
+    /**
+     * @type {THREE.BoxHelper}
+     */
+    mainAABB;
+
     #wireframeMaterialBlack = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true, side: THREE.DoubleSide });
     #wireframeMaterialYellow = new THREE.MeshBasicMaterial({ color: 0xFFFF00, wireframe: true, side: THREE.DoubleSide });
 
@@ -85,6 +90,11 @@ export class SceneHandler {
     volumeMeshInfo = new Map();
 
     clearScene() {
+        if (this.mainAABB) {
+            this.scene.remove(this.mainAABB);
+            this.mainAABB = undefined;
+        }
+
         for (const mesh of this.meshes) {
             this.scene.remove(mesh);
         }
@@ -112,7 +122,7 @@ export class SceneHandler {
      * @param {{wireframe: boolean, aabb: boolean, subAABB: boolean}} settings 
      */
     async updateScene(data, settings) {
-        const { wireframe, aabb, subAABB } = settings;
+        const { aabb, wireframe, subAABB } = settings;
 
         const bufferGeometry = this.#bufferGeometryFromRaw(data.rawGeometry);
         const mesh = new THREE.Mesh(bufferGeometry, this.#volumeMaterialPhong);
@@ -133,17 +143,22 @@ export class SceneHandler {
 
         if (wireframe) {
             const wireframeMesh = new THREE.Mesh(
-                geometry,
+                bufferGeometry,
                 this.#wireframeMaterialBlack
             );
             mesh.add(wireframeMesh);
         }
 
         if (aabb) {
-            const box = new THREE.BoxHelper(this.volumeGroup, 0xffff00);
-            box.geometry.computeBoundingBox();
-            this.meshes.push(box);
-            this.scene.add(box);
+            if (!this.mainAABB) {
+                const box = new THREE.BoxHelper(this.volumeGroup, 0xffff00);
+                box.geometry.computeBoundingBox();
+                this.scene.add(box);
+                this.mainAABB = box;
+            }
+            else {
+                this.mainAABB.update();
+            }
         }
     }
 

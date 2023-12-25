@@ -212,16 +212,15 @@ export class SimplexNoiseSphereGenerator extends Generator {
 
         const aabb = shape.getAABB().map(x => Math.round(x));
 
-        for (let y = aabb.minY; y < aabb.maxY; y++) {
-            for (let x = aabb.minX; x < aabb.maxX; x++) {
-                for (let z = aabb.minZ; z < aabb.maxZ; z++) {
+        for (let z = aabb.minZ; z < aabb.maxZ; z++) {
+            for (let y = aabb.minY; y < aabb.maxY; y++) {
 
+                const t = (y - aabb.minY) / (aabb.maxY - aabb.minY); //min-max rescale
+                const c = Math.round(lerp(t, 0, 10)) * 25;
+                const color = ARGB.color(255, c, c, 255);
+
+                for (let x = aabb.minX; x < aabb.maxX; x++) {
                     if (!shape.contains(x, y, z, sqrDistanceFunc)) continue;
-
-                    const t = (y - aabb.minY) / (aabb.maxY - aabb.minY); //min-max rescale
-
-                    const c = Math.round(lerp(t, 0, 10)) * 25;
-                    const color = ARGB.color(255, c, c, 255);
                     chunkedVolume.set(x, y, z, color);
                 }
             }
@@ -235,7 +234,7 @@ export class EggGenerator extends Generator {
 
     generate(config) {
         const radius = config.searchRadius;
-        const shape = EllipticShape.createFromBaseAndTip(0, radius*2, 0, 0, -radius, 0, radius);
+        const shape = EllipticShape.createFromBaseAndTip(0, radius * 2, 0, 0, -radius, 0, radius);
 
         const seed = Math.round(Math.random() * 2000000);
         const frequency = 0.35;
@@ -347,7 +346,7 @@ export class CuboidCellularNoiseGenerator extends Generator {
     generate(config) {
         const chunkedVolume = new ChunkedVolume();
 
-        const searchDist = config.searchRadius;
+        const distance = config.searchRadius;
         const seed = 1337;
         const frequency = 0.2;
         const borderThreshold = 0.1;
@@ -375,9 +374,9 @@ export class CuboidCellularNoiseGenerator extends Generator {
             return cellularNoise.GetNoise(cursor.x, cursor.y, cursor.z);
         };
 
-        for (let y = -searchDist; y < searchDist; y++) {
-            for (let x = -searchDist; x < searchDist; x++) {
-                for (let z = -searchDist; z < searchDist; z++) {
+        for (let y = -distance; y < distance; y++) {
+            for (let x = -distance; x < distance; x++) {
+                for (let z = -distance; z < distance; z++) {
                     const { dist, closestHash, specialHash } = getNoise(x, y, z);
                     const noiseValue = dist + 1;
                     if (noiseValue > borderThreshold) {
@@ -386,6 +385,100 @@ export class CuboidCellularNoiseGenerator extends Generator {
                         const color = ARGB.color(255, g, g, g);
                         chunkedVolume.set(x, y, z, color);
                     }
+                }
+            }
+        }
+
+        return chunkedVolume;
+    }
+}
+
+export class SimplexNoisePillarsGenerator extends Generator {
+
+    generate(config) {
+        const chunkedVolume = new ChunkedVolume();
+
+        const halfSize = config.searchRadius;
+        const size = halfSize * 2;
+
+        const seed = Math.round(Math.random() * 2000000);
+
+        const noise = new FastNoiseLite(seed);
+        noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2S);
+        noise.SetFrequency(0.10);
+
+        const aabb = new AxisAlignedBoundingBox(0, 0, 0, size, size, size);
+        const originX = halfSize;
+        const originY = halfSize;
+        const originZ = halfSize;
+
+        for (let y = aabb.minY; y < aabb.maxY; y++) {
+            const pctY = (y - aabb.minY) / (aabb.maxY - aabb.minY); //min-max rescale
+
+            for (let x = aabb.minX; x < aabb.maxX; x++) {
+                for (let z = aabb.minZ; z < aabb.maxZ; z++) {
+
+                    const fx = x => ((x - 0.5) ** 2 * 4) * -1 + 1;
+
+                    const noiseValue = noise.GetNoise(originX - x, 0, originZ - z);
+
+                    if (noiseValue < 0.42 + fx(pctY) * 0.2) continue;
+
+                    const c = Math.round(lerp(pctY, 0, 10)) * 25;
+                    const color = ARGB.color(255, c, c, 255);
+
+                    chunkedVolume.set(x, y, z, color);
+                }
+            }
+        }
+
+        return chunkedVolume;
+    }
+}
+
+export class HangingSpikesGenerator extends Generator {
+
+    easeInExpo(x) {
+        return x === 0 ? 0 : Math.pow(2, 10 * x - 10);
+    }
+
+    generate(config) {
+        const chunkedVolume = new ChunkedVolume();
+
+        const halfSize = config.searchRadius;
+        const size = halfSize * 2;
+
+        const seed = Math.round(Math.random() * 2000000);
+
+        const noise = new FastNoiseLite(seed);
+        noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2S);
+        noise.SetFrequency(0.10);
+
+        const aabb = new AxisAlignedBoundingBox(0, 0, 0, size, size, size);
+        const originX = halfSize;
+        const originY = halfSize;
+        const originZ = halfSize;
+
+        const shape = new SphereShape(halfSize, halfSize, halfSize, halfSize);
+
+        for (let y = aabb.minY; y < aabb.maxY; y++) {
+            const pctY = (y - aabb.minY) / (aabb.maxY - aabb.minY); //min-max rescale
+
+            for (let x = aabb.minX; x < aabb.maxX; x++) {
+                for (let z = aabb.minZ; z < aabb.maxZ; z++) {
+
+                    if (!shape.contains(x, y, z)) continue;
+
+                    const noiseValue = noise.GetNoise(originX - x, 0, originZ - z);
+
+                    const fx = x => ((x - 0.5) ** 2 * 4) * -1 + 1;
+
+                    if (noiseValue < 0.5 + this.easeInExpo(1 - pctY) * 10) continue;
+
+                    const c = Math.round(lerp(pctY, 0, 10)) * 25;
+                    const color = ARGB.color(255, 0, 255, c);
+
+                    chunkedVolume.set(x, y, z, color);
                 }
             }
         }
@@ -608,8 +701,12 @@ export class MoundGenerator extends Generator {
 
             for (let z = aabb.minZ; z < aabb.maxZ; z++) {
                 for (let y = aabb.minY; y < aabb.maxY; y++) {
+
+                    const color = ARGB.color(255, 220, clamp(y / maxY * 255, 0, 255), 100);
+
                     for (let x = aabb.minX; x < aabb.maxX; x++) {
                         if (!shape.contains(x, y, z)) continue;
+                        chunkedVolume.set(x, y, z, color);
 
                         /*
                         let skip = false;
@@ -629,8 +726,8 @@ export class MoundGenerator extends Generator {
                         //  const { dist, closestHash, specialHash } = getNoise(x, y, z);
                         // const noiseValue = dist + 1;
                         // if (noiseValue >= borderThreshold) {
-                        const color = ARGB.color(255, 220, clamp(y / maxY * 255, 0, 255), 100);
-                        chunkedVolume.set(x, y, z, color);
+                        //    const color = ARGB.color(255, 220, clamp(y / maxY * 255, 0, 255), 100);
+                        //    chunkedVolume.set(x, y, z, color);
                         // }
                         //}
                     }

@@ -236,7 +236,7 @@ export class DenseVolume extends VoxelVolume {
 
     constructor(sizeX, sizeY, sizeZ) {
         super(sizeX, sizeY, sizeZ);
-        this.#voxels = new Array(sizeX * sizeY * sizeZ).fill(0);
+        this.#voxels = new Int32Array(sizeX * sizeY * sizeZ).fill(0);
     }
 
     get(x, y, z) {
@@ -313,17 +313,21 @@ export class ChunkedVolume extends VoxelVolume {
     }
 
     toChunkPos(x, y, z) {
+        const math = Math;
+        
         return [
-            Math.floor(x / this.#chunkSize),
-            Math.floor(y / this.#chunkSize),
-            Math.floor(z / this.#chunkSize),
+            math.floor(x / this.#chunkSize),
+            math.floor(y / this.#chunkSize),
+            math.floor(z / this.#chunkSize),
         ];
     }
 
     #getChunkKey(x, y, z) {
-        x = Math.floor(x / this.#chunkSize);
-        y = Math.floor(y / this.#chunkSize);
-        z = Math.floor(z / this.#chunkSize);
+        const math = Math;
+
+        x = math.floor(x / this.#chunkSize);
+        y = math.floor(y / this.#chunkSize);
+        z = math.floor(z / this.#chunkSize);
 
         return this.#linearize(x, y, z);
     }
